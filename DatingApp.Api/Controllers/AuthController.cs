@@ -1,8 +1,14 @@
+using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 using DatingApp.Api.Data;
 using DatingApp.Api.Dtos;
 using DatingApp.Api.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace DatingApp.Api.Controllers
 {
@@ -11,29 +17,77 @@ namespace DatingApp.Api.Controllers
     public class AuthController : ControllerBase
     {
         public readonly IAuthRepository _repo;
-        public AuthController(IAuthRepository repo)
+        public readonly IConfiguration _config;
+        public AuthController(IAuthRepository repo, IConfiguration config)
         {
+            _config = config;
             _repo = repo;
 
         }
         [HttpPost("register")]
-            public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
-            //                                       [FromBody] - [ApiController] takes care of this for us 
+        public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
+        //                                       [FromBody] - [ApiController] takes care of this for us 
         {
             // validate the request taken care of in DTO 
 
             // send user name convert to lowercase 
             userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
 
-            if(await _repo.UserExisits(userForRegisterDto.Username))
+            if (await _repo.UserExisits(userForRegisterDto.Username))
                 return BadRequest("Username already exisists");
 
             // create user 
-            var userToCreate = new User{Username = userForRegisterDto.Username};
+            var userToCreate = new User { Username = userForRegisterDto.Username };
 
             var createdUser = await _repo.Register(userToCreate, userForRegisterDto.Password);
 
             return StatusCode(201);
+
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
+        {
+            var userFromRepo = await _repo.Login(userForLoginDto.Username.ToLower(), userForLoginDto.Password);
+
+            // if no user return unauth
+            if (userFromRepo == null)
+                return Unauthorized();
+
+            // create claim usersId and users username 
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, userFromRepo.Id.ToString()),
+                new Claim(ClaimTypes.Name, userFromRepo.Username)
+            };
+
+            // create key sign the token 
+            var key = new SymmetricSecurityKey(Encoding.UTF8
+                .GetBytes(_config.GetSection("AppSettings:Token").Value ));
+
+            // generate signing creds and encrypt with hashing alg 
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+            // create security token descriptor w 24 hours 
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = creds
+
+            };
+
+            // token handler
+            var tokenHandler = new JwtSecurityTokenHandler();
+            // using token handler, create a token
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            // write the token into the reponse
+            return Ok(new {
+                token = tokenHandler.WriteToken(token)
+            });
+            
+
 
         }
 
