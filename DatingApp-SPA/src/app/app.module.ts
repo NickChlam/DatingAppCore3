@@ -11,12 +11,16 @@ import { NgModule } from '@angular/core';
 
 // services
 import { AuthService } from './_services/auth.service';
+import { RegisterComponent } from './register/register.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ValueComponent,
-    NavComponent
+    NavComponent,
+    RegisterComponent,
+    HomeComponent
   ],
   imports: [
     BrowserModule,
