@@ -1,7 +1,7 @@
 // components
 import { NavComponent } from './nav/nav.component';
 import { AppComponent } from './app.component';
-import { ValueComponent } from './value/value.component';
+
 
 // angular modules
 import { HttpClientModule } from '@angular/common/http';
@@ -17,7 +17,6 @@ import { HomeComponent } from './home/home.component';
 @NgModule({
   declarations: [
     AppComponent,
-    ValueComponent,
     NavComponent,
     RegisterComponent,
     HomeComponent
