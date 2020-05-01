@@ -11,8 +11,15 @@ import { NgModule } from '@angular/core';
 
 // services
 import { AuthService } from './_services/auth.service';
+
+// components
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
+import { ErrorInterceptorProvider } from './_services/error.interceptor';
+
+// ngx-bootstrap
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 
 @NgModule({
   declarations: [
@@ -24,10 +31,13 @@ import { HomeComponent } from './home/home.component';
   imports: [
     BrowserModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    BsDropdownModule.forRoot()
   ],
   providers: [
-    AuthService
+    AuthService,
+    ErrorInterceptorProvider
   ],
   bootstrap: [AppComponent]
 })

@@ -1,9 +1,11 @@
 using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DatingApp.Api.Data;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,6 +17,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Diagnostics;
+using DatingApp.Api.helpers;
 
 namespace DatingApp.Api
 {
@@ -63,6 +67,26 @@ namespace DatingApp.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+            }
+            else {
+                // allows to use a global exception handler 
+                app.UseExceptionHandler(builder => {
+                    // get access to the contect andd response 
+                    builder.Run(async context => {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if(error != null) {
+                            
+                            // Adds a new header into the response 
+                            context.Response.AddApplicationError(error.Error.Message);
+                            // write error message to http response 
+                            await context.Response.WriteAsync(error.Error.Message);
+                            
+                        }
+                        
+                    });
+                });
             }
 
             // app.UseHttpsRedirection();

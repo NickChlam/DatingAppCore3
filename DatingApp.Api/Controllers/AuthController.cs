@@ -26,7 +26,7 @@ namespace DatingApp.Api.Controllers
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
-        //                                       [FromBody] - [ApiController] takes care of this for us 
+        //   [FromBody] - [ApiController] takes care of this for us 
         {
             // validate the request taken care of in DTO 
 
@@ -48,12 +48,14 @@ namespace DatingApp.Api.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login(UserForLoginDto userForLoginDto)
         {
+
+           
             var userFromRepo = await _repo.Login(userForLoginDto.Username.ToLower(), userForLoginDto.Password);
 
             // if no user return unauth
             if (userFromRepo == null)
                 return Unauthorized();
-
+ 
             // create claim usersId and users username 
             var claims = new[]
             {
