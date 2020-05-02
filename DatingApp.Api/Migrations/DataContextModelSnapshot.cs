@@ -16,11 +16,63 @@ namespace DatingApp.Api.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.0.1");
 
+            modelBuilder.Entity("DatingApp.Api.Models.Photo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsMain")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Photos");
+                });
+
             modelBuilder.Entity("DatingApp.Api.Models.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("City")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Country")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Gender")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Interests")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Introduction")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LookingFor")
+                        .HasColumnType("TEXT");
 
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("BLOB");
@@ -29,6 +81,9 @@ namespace DatingApp.Api.Migrations
                         .HasColumnType("BLOB");
 
                     b.Property<string>("Username")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("knownAs")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -48,6 +103,15 @@ namespace DatingApp.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Values");
+                });
+
+            modelBuilder.Entity("DatingApp.Api.Models.Photo", b =>
+                {
+                    b.HasOne("DatingApp.Api.Models.User", "User")
+                        .WithMany("Photos")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Diagnostics;
 using DatingApp.Api.helpers;
+using AutoMapper;
 
 namespace DatingApp.Api
 {
@@ -36,10 +37,15 @@ namespace DatingApp.Api
         {
             
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(opt=> 
+            {
+                opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+            }); // add newtonsoft instead of system.text.json and ignore slef referening loops
             services.AddCors();
+            services.AddAutoMapper(typeof(DatingRespository).Assembly); // must give it an assembly 
             services.AddScoped<IAuthRepository, AuthRepository>();
-            // specify authentication scheme 
+            services.AddScoped<IDatingRepository, DatingRespository>();
+            // specify authentication scheme - 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => {
                     options.TokenValidationParameters = new TokenValidationParameters
@@ -52,16 +58,9 @@ namespace DatingApp.Api
 
                     };
                 });
-            
-            
-            
-
-            
-            
-            
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        // This method gets called by the runtime at startup. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -71,7 +70,7 @@ namespace DatingApp.Api
             else {
                 // allows to use a global exception handler 
                 app.UseExceptionHandler(builder => {
-                    // get access to the contect andd response 
+                    // get access to the context and add response 
                     builder.Run(async context => {
                         context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
