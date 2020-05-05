@@ -18,7 +18,7 @@
 
   <div class="form-group">
       <input [ngClass]="{'is-invalid': registerForm.get('knownAs').errors && registerForm.get('knownAs').touched}" class="form-control"
-        placeholder="Known as" formControlName="knownAs">
+        placeholder="Known as" formControlName="knownAs"  >
       <div class="invalid-feedback" *ngIf="registerForm.get('knownAs').touched && registerForm.get('knownAs').hasError('required')">Known as is required</div>
     </div>
   
@@ -26,7 +26,7 @@
 
     <div class="form-group">
         <input [ngClass]="{'is-invalid': registerForm.get('dateOfBirth').errors && registerForm.get('dateOfBirth').touched}" class="form-control"
-          placeholder="Date of Birth" formControlName="dateOfBirth" type="date" >
+        placeholder="Date fo Birth" formControlName="dateOfBirth" type="text" bsDatepicker >
         <div class="invalid-feedback" *ngIf="registerForm.get('dateOfBirth').touched && registerForm.get('dateOfBirth').hasError('required')">Date of Birth is required</div>
       </div>
 
@@ -64,7 +64,7 @@
 
     <div class="form-group">
       <input  [ngClass]="{'is-invalid': registerForm.get('password').errors && registerForm.get('password').touched }" 
-              type="password" class="form-control" placeholder="Password"  formControlName ="password" type="text" >
+              type="password" class="form-control" placeholder="Password"  formControlName ="password" >
       <div class="invalid-feedback" *ngIf="registerForm.get('password').hasError('required') && registerForm.get('password').touched "  >password is required</div>
       <div class="invalid-feedback" *ngIf="registerForm.get('password').hasError('minlength') && registerForm.get('password').touched "  >must be 4 charachters</div>
       <div class="invalid-feedback" *ngIf="registerForm.get('password').hasError('maxlength') && registerForm.get('password').touched "  >max 8 charachters</div>
@@ -86,5 +86,3 @@
     
   </form>
 
-<p>Form Value {{ registerForm.value | json }}</p>
-<p>Form Status {{ registerForm.status | json }}</p>

@@ -2,6 +2,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
 import { AlertifyService } from '../_services/alertify.service';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { User } from '../_models/user';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -10,12 +12,12 @@ import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms'
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  model: any = {};
+  user: User;
   registerForm: FormGroup;
   @Output() cancelRegister = new EventEmitter();
 
 
-  constructor(private authService: AuthService, private alertify: AlertifyService, private fb: FormBuilder) { }
+  constructor(private authService: AuthService, private alertify: AlertifyService, private fb: FormBuilder, private router: Router) { }
 
 
 
@@ -28,7 +30,7 @@ export class RegisterComponent implements OnInit {
       gender: ['male'],
       username: ['', Validators.required],
       knownAs: ['', Validators.required],
-      dateOfBirth: ['null', Validators.required],
+      dateOfBirth: ['', Validators.required],
       city: ['', Validators.required],
       country: ['', Validators.required],
       password: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(8)] ],
@@ -41,12 +43,21 @@ export class RegisterComponent implements OnInit {
   }
 
   register() {
-    // this.authService.register(this.model).subscribe( () => {
-    //   this.alertify.success('registration successful');
-    // }, err => {
-    //   // TODO: ERROR logging
-    //   this.alertify.error(err);
-    // });
+    if (this.registerForm.valid) {
+      this.user = Object.assign({}, this.registerForm.value);
+       this.authService.register(this.user).subscribe( () => {
+      this.alertify.success('registration successful');
+    }, err => {
+      // TODO: ERROR logging
+      this.alertify.error(err);
+    }, () => {
+      this.authService.login(this.user).subscribe( () => {
+        this.router.navigate(['/members']);
+      });
+     
+    });
+    }
+   
     console.log(this.registerForm.value);
 
   }
